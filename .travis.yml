@@ -2,6 +2,7 @@ language: ruby
 rvm:
   - 1.9.3
 before_install:
+  - gem install bundler
   - cd setup
   - sudo ./setup.sh
 script:
