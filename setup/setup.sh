@@ -32,6 +32,8 @@ case ${osinfo} in
   ;;
   # Debian 7+ Dependency Installation
   Debian)
+	echo '[*] Bundle Installing'
+	bundle install
     echo '[*] Checking Ruby Environment'
     rvmhere=`which rvm | wc -l`
     rubyhere=`which ruby | wc -l`
@@ -49,6 +51,7 @@ case ${osinfo} in
   Ubuntu)
     echo '[*] Installing Ubuntu Dependencies'
     apt-get install rubygems
+    bundle install
     echo
     echo '[*] Checking Ruby Environment'
     rvmhere=`which rvm | wc -l`
@@ -75,6 +78,7 @@ case ${osinfo} in
     fi
     echo
     echo '[*] Checking Ruby Environment'
+    bundle install
     rvmhere=`which rvm | wc -l`
     rubyhere=`which ruby | wc -l`
     if [[ $rvmhere -eq 0  && $rubyhere -eq 0 ]]
