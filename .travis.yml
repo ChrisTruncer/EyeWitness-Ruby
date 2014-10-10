@@ -6,4 +6,5 @@ before_install:
   - sudo ./setup.sh
 script:
   - "cd .."
+  - "bundle install"
   - "sudo ./EyeWitness.rb --single www.google.com"
