@@ -1,3 +1,6 @@
+[10.14.2014]
+    Modified..: Eyewitness now supports basic auth.  New command line options are available to force basic auth using the provided username and password for all requests.  This obviously requires using a modified list of URLs to only attempt basic auth against them.  Thanks to @digininja for the idea.  This was just the likely beginning of Github Issue #97 (but under original eyewitness)
+
 [10.10.2014]
 	Modified..: EyeWitness has now split into two repos, one for python, and one for ruby.  This will allow for easier issues/feature request tracking between the two languages.
 

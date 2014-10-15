@@ -74,6 +74,8 @@ class CliParser
     options.proxy_ip = nil
     options.proxy_port = nil
     options.redirection = nil
+    options.auth_user = nil
+    options.auth_pass = nil
 
     # Check for config's file existance, and if present, read in its values
     begin
@@ -128,11 +130,19 @@ class CliParser
         options.rid_dns = true
       end
       opts.on("--createtargets Filename", "Create a file containing web servers",
-          "from nmap or nessus output.\n\n") do |target_make|
+          "from nmap or nessus output.") do |target_make|
         options.create_targets = target_make
       end
-      opts.on("--redirects", "Show web redirections in the report") do |redir|
+      opts.on("--redirects", "Show web redirections in the report.\n\n") do |redir|
         options.redirection = true
+      end
+
+      # Authentication Settings for EyeWitness
+      opts.on("--username jsmith", "Username for basic/digest authentication.") do |the_user|
+        options.auth_user = the_user
+      end
+      opts.on("--password password123", "Password for basic/digest authentication.\n\n") do |the_pass|
+        options.auth_pass = the_pass
       end
 
       # Proxy Settings for EyeWitness
@@ -464,12 +474,24 @@ class NmapParser < Nokogiri::XML::SAX::Document
 end   # End of nmap parsing class
 
 
-def capture_screenshot(sel_driver, output_path, url_to_grab)
+def capture_screenshot(sel_driver, output_path, url_to_grab, cli_object)
 
   # do a "try catch" for timeout issues
   begin
     # Function used to capture screenshots with selenium
+    if ((!cli_object.auth_user.nil?) and (!cli_object.auth_pass.nil?))
+      orig_name = url_to_grab
+      url_to_grab = url_to_grab.split('://')[0] + "://" + cli_object.auth_user + ":" + cli_object.auth_pass + "@" + url_to_grab.split('://')[1]
+    else
+    end
     sel_driver.get url_to_grab
+
+    # Rename for reporting purposes.  This isn't efficient, but then again, this app could be done better
+    # I'll want to likely refactor the entire source code and work on making it more efficient at some point.
+    if ((!cli_object.auth_user.nil?) and (!cli_object.auth_pass.nil?))
+      url_to_grab = orig_name
+    end
+
     screenshot_name = url_to_grab.gsub('://', '.').gsub('/', '.').gsub(':', '.')
     sourcecode_name = "#{screenshot_name}.txt"
     screenshot_name = "#{screenshot_name}.png"
@@ -944,13 +966,6 @@ def source_header_grab(url_to_head, total_timeout, trace_redirect)
     response = "UNKNOWNERROR"
   end
 
-  # Return the response object
-  # response.each gives header info
-  if response.respond_to?('code')
-    if response.code == "401"
-      response = "UNAUTHORIZED"
-    end
-  end
   return response, invalid_ssl, all_redirects
 end   # End header_grab function
 
@@ -968,13 +983,13 @@ def table_maker(web_report_html, website_url, possible_creds, page_header_source
     web_report_html += "<br><b>Default credentials:</b> #{encoded_creds} <br>"
   end
 
+  screenshot_path = File.join(output_report_path, "screens", screenshot_name)
+
   # If EyeWitness encountered any of the identified errors, add it to the report
   if page_header_source == "CONNECTIONDENIED"
     web_report_html += "CONNECTION REFUSED FROM SERVER!</div></td><td> Connection Refused from server!</td></tr>"
   elsif page_header_source == "TIMEDOUT"
     web_report_html += "Connection to web server timed out!</div></td><td> Connection to web server timed out!</td></tr>"
-  elsif page_header_source == "UNAUTHORIZED"
-    web_report_html += "Can't auth to page (Basic auth?)!</div></td><td> Can't authenticate to web page (Basic auth?)</td></tr>"
   elsif page_header_source == "UNKNOWNERROR"
     web_report_html += "Unknown error when connecting to web server!</div></td><td> Unknown error when connecting to web server.  Please contact developer and give him details (like the URL) to investigate this!</td></tr>"
   elsif page_header_source == "BADURL"
@@ -1016,7 +1031,7 @@ def table_maker(web_report_html, website_url, possible_creds, page_header_source
     web_report_html += "<br><br><a href=\"source/#{source_code_name}\" target=\"_blank\">Source Code</a></div></td>\n"
 
     if potential_blank == "TIMEOUTERROR"
-      web_report_html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE!</td></tr>"
+      web_report_html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE, OR AUTHENTICATION (BASIC) FAILURE!</td></tr>"
     else
       web_report_html += "<td><div id=\"screenshot\" style=\"display: inline-block; width:850px; height 400px; overflow: scroll;\">
         <a href=\"screens/#{screenshot_name}\" target=\"_blank\"><img src=\"screens/#{screenshot_name}\"
@@ -1039,12 +1054,12 @@ def multi_table_maker(html_dictionary, website_url, possible_creds, page_header_
     html += "<br><b>Default credentials:</b> #{encoded_creds} <br>\n"
   end
 
+  screenshot_path = File.join(output_report_path, "screens", screenshot_name)
+
   if page_header_source == "CONNECTIONDENIED"
     html += "CONNECTION REFUSED FROM SERVER!</div></td><td> Connection Refused from server!</td></tr>"
   elsif page_header_source == "TIMEDOUT"
     html += "Connection to web server timed out!</div></td><td> Connection to web server timed out!</td></tr>"
-  elsif page_header_source == "UNAUTHORIZED"
-    html += "Can't auth to page (Basic auth?)!</div></td><td> Can't authenticate to web page (Basic auth?)</td></tr>"
   elsif page_header_source == "UNKNOWNERROR"
     html += "Unknown error when connecting to web server!</div></td><td> Unknown error when connecting to web server.  Please contact developer and give him details (like the URL) to investigate this!</td></tr>"
   elsif page_header_source == "BADURL"
@@ -1086,7 +1101,7 @@ def multi_table_maker(html_dictionary, website_url, possible_creds, page_header_
     html += "<br><br><a href=\"source/#{source_code_name}\" target=\"_blank\">Source Code</a></div></td>\n"
 
     if potential_blank == "TIMEOUTERROR"
-      html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE!</td></tr>"
+      html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE, OR AUTHENTICATION (BASIC) FAILURE!</td></tr>"
     else
       html += "<td><div id=\"screenshot\" style=\"display: inline-block; width:850px; height 400px; overflow: scroll;\">
         <a href=\"screens/#{screenshot_name}\" target=\"_blank\"><img src=\"screens/#{screenshot_name}\"
@@ -1254,6 +1269,11 @@ begin
   # Parse all the command line arguments
   cli_parsed = CliParser.parse(ARGV)
 
+  if ((!cli_parsed.auth_user.nil?) and (!cli_parsed.auth_pass.nil?))
+    print "[*] Status: Attempting to authenticate to all URLS with user: #{cli_parsed.auth_user}\n"
+    print "[*] and password: #{cli_parsed.auth_pass}!\n\n"
+  end
+
   # Determine the path that EyeWitness is in
   eyewitness_path = File.expand_path(File.dirname(__FILE__))
 
@@ -1365,7 +1385,7 @@ begin
 
     # If not cycling through user agents, then go to the site, capture screenshot and source code
     unused_length_difference = nil
-    single_source, page_title, web_source_code = capture_screenshot(eyewitness_selenium_driver, report_folder, cli_parsed.single_website)
+    single_source, page_title, web_source_code = capture_screenshot(eyewitness_selenium_driver, report_folder, cli_parsed.single_website, cli_parsed)
 
     # returns back an object that needs to be iterated over for the headers
     single_site_headers_source, ssl_state, any_redirect = source_header_grab(cli_parsed.single_website, cli_parsed.timeout, cli_parsed.redirection)
@@ -1487,7 +1507,7 @@ begin
         puts "Attempting to capture #{individual_url} (#{url_counter}/#{total_urls})"
 
         unused_length_difference = nil
-        single_source, page_title, web_source_code = capture_screenshot(eyewitness_selenium_driver_multi_site, report_folder, individual_url)
+        single_source, page_title, web_source_code = capture_screenshot(eyewitness_selenium_driver_multi_site, report_folder, individual_url, cli_parsed)
         
         # returns back an object that needs to be iterated over for the headers and source code
         multi_site_headers_source, ssl_current_state, potential_redirects = source_header_grab(individual_url, cli_parsed.timeout, cli_parsed.redirection)
