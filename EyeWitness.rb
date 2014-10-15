@@ -1031,7 +1031,7 @@ def table_maker(web_report_html, website_url, possible_creds, page_header_source
     web_report_html += "<br><br><a href=\"source/#{source_code_name}\" target=\"_blank\">Source Code</a></div></td>\n"
 
     if potential_blank == "TIMEOUTERROR"
-      web_report_html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE, OR AUTHENTICATION (BASIC) FAILURE!</td></tr>"
+      web_report_html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE, OR AUTHENTICATION (BASIC/DIGEST) FAILURE!</td></tr>"
     else
       web_report_html += "<td><div id=\"screenshot\" style=\"display: inline-block; width:850px; height 400px; overflow: scroll;\">
         <a href=\"screens/#{screenshot_name}\" target=\"_blank\"><img src=\"screens/#{screenshot_name}\"
@@ -1101,7 +1101,7 @@ def multi_table_maker(html_dictionary, website_url, possible_creds, page_header_
     html += "<br><br><a href=\"source/#{source_code_name}\" target=\"_blank\">Source Code</a></div></td>\n"
 
     if potential_blank == "TIMEOUTERROR"
-      html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE, OR AUTHENTICATION (BASIC) FAILURE!</td></tr>"
+      html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE, OR AUTHENTICATION (BASIC/DIGEST) FAILURE!</td></tr>"
     else
       html += "<td><div id=\"screenshot\" style=\"display: inline-block; width:850px; height 400px; overflow: scroll;\">
         <a href=\"screens/#{screenshot_name}\" target=\"_blank\"><img src=\"screens/#{screenshot_name}\"
