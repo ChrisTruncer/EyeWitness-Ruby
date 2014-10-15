@@ -966,13 +966,6 @@ def source_header_grab(url_to_head, total_timeout, trace_redirect)
     response = "UNKNOWNERROR"
   end
 
-  # Return the response object
-  # response.each gives header info
-  #if response.respond_to?('code')
-  #  if response.code == "401"
-  #    response = "UNAUTHORIZED"
-  #  end
-  #end
   return response, invalid_ssl, all_redirects
 end   # End header_grab function
 
