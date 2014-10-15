@@ -968,11 +968,11 @@ def source_header_grab(url_to_head, total_timeout, trace_redirect)
 
   # Return the response object
   # response.each gives header info
-  if response.respond_to?('code')
-    if response.code == "401"
-      response = "UNAUTHORIZED"
-    end
-  end
+  #if response.respond_to?('code')
+  #  if response.code == "401"
+  #    response = "UNAUTHORIZED"
+  #  end
+  #end
   return response, invalid_ssl, all_redirects
 end   # End header_grab function
 
@@ -990,17 +990,13 @@ def table_maker(web_report_html, website_url, possible_creds, page_header_source
     web_report_html += "<br><b>Default credentials:</b> #{encoded_creds} <br>"
   end
 
+  screenshot_path = File.join(output_report_path, "screens", screenshot_name)
+
   # If EyeWitness encountered any of the identified errors, add it to the report
   if page_header_source == "CONNECTIONDENIED"
     web_report_html += "CONNECTION REFUSED FROM SERVER!</div></td><td> Connection Refused from server!</td></tr>"
   elsif page_header_source == "TIMEDOUT"
     web_report_html += "Connection to web server timed out!</div></td><td> Connection to web server timed out!</td></tr>"
-  elsif page_header_source == "UNAUTHORIZED"
-    if File.exist?('screens/#{screenshot_name}')
-      web_report_html += "Can't grab headers, however, it looks like authentication was successful!</div></td><td><div id=\"screenshot\" style=\"display: inline-block; width:850px; height 400px; overflow: scroll;\"><a href=\"screens/#{screenshot_name}\" target=\"_blank\"><img src=\"screens/#{screenshot_name}\" height=\"400\"></a></div></td></tr>"
-    else
-      web_report_html += "Can't auth to page (Basic auth?)!</div></td><td> Can't authenticate to web page (Basic auth?)</td></tr>"
-    end
   elsif page_header_source == "UNKNOWNERROR"
     web_report_html += "Unknown error when connecting to web server!</div></td><td> Unknown error when connecting to web server.  Please contact developer and give him details (like the URL) to investigate this!</td></tr>"
   elsif page_header_source == "BADURL"
@@ -1042,7 +1038,7 @@ def table_maker(web_report_html, website_url, possible_creds, page_header_source
     web_report_html += "<br><br><a href=\"source/#{source_code_name}\" target=\"_blank\">Source Code</a></div></td>\n"
 
     if potential_blank == "TIMEOUTERROR"
-      web_report_html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE!</td></tr>"
+      web_report_html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE, OR AUTHENTICATION (BASIC) FAILURE!</td></tr>"
     else
       web_report_html += "<td><div id=\"screenshot\" style=\"display: inline-block; width:850px; height 400px; overflow: scroll;\">
         <a href=\"screens/#{screenshot_name}\" target=\"_blank\"><img src=\"screens/#{screenshot_name}\"
@@ -1065,12 +1061,12 @@ def multi_table_maker(html_dictionary, website_url, possible_creds, page_header_
     html += "<br><b>Default credentials:</b> #{encoded_creds} <br>\n"
   end
 
+  screenshot_path = File.join(output_report_path, "screens", screenshot_name)
+
   if page_header_source == "CONNECTIONDENIED"
     html += "CONNECTION REFUSED FROM SERVER!</div></td><td> Connection Refused from server!</td></tr>"
   elsif page_header_source == "TIMEDOUT"
     html += "Connection to web server timed out!</div></td><td> Connection to web server timed out!</td></tr>"
-  elsif page_header_source == "UNAUTHORIZED"
-    html += "Can't auth to page (Basic auth?)!</div></td><td> Can't authenticate to web page (Basic auth?)</td></tr>"
   elsif page_header_source == "UNKNOWNERROR"
     html += "Unknown error when connecting to web server!</div></td><td> Unknown error when connecting to web server.  Please contact developer and give him details (like the URL) to investigate this!</td></tr>"
   elsif page_header_source == "BADURL"
@@ -1112,7 +1108,7 @@ def multi_table_maker(html_dictionary, website_url, possible_creds, page_header_
     html += "<br><br><a href=\"source/#{source_code_name}\" target=\"_blank\">Source Code</a></div></td>\n"
 
     if potential_blank == "TIMEOUTERROR"
-      html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE!</td></tr>"
+      html += "<td>REQUEST TIMED OUT WHILE ATTEMPTING TO CONNECT TO THE WEBSITE, OR AUTHENTICATION (BASIC) FAILURE!</td></tr>"
     else
       html += "<td><div id=\"screenshot\" style=\"display: inline-block; width:850px; height 400px; overflow: scroll;\">
         <a href=\"screens/#{screenshot_name}\" target=\"_blank\"><img src=\"screens/#{screenshot_name}\"
