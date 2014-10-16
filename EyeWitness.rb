@@ -501,7 +501,14 @@ def capture_screenshot(sel_driver, output_path, url_to_grab, cli_object)
     File.open("#{source_code_path}", 'w') do |write_sourcecode|
       write_sourcecode.write(sel_driver.page_source)
     end
-    return sel_driver.page_source, sel_driver.title, source_code_path
+
+    title_tag = sel_driver.title
+
+    # Try to close pop up boxes here
+    popup = sel_driver.switch_to.alert
+    popup.dismiss
+
+    return sel_driver.page_source, title_tag, source_code_path
   rescue Timeout::Error
     puts "[*] Error: Request Timed out for screenshot..."
     blank_page_source = "TIMEOUTERROR"
@@ -519,6 +526,8 @@ def capture_screenshot(sel_driver, output_path, url_to_grab, cli_object)
     blank_page_source = "POSSIBLEXML"
     no_title = "Bad response, or possible XML"
     return blank_page_source, no_title, source_code_path
+  rescue Selenium::WebDriver::Error::NoAlertPresentError
+    return sel_driver.page_source, title_tag, source_code_path
   rescue NameError
     blank_page_source = "POSSIBLEXML"
     no_title = "Bad response, or possible XML"
