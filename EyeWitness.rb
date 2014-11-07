@@ -875,33 +875,19 @@ def selenium_driver(possible_user_agent, possible_proxy_ip, possible_proxy_port)
   # Other drivers are available as well 
   #http://selenium.googlecode.com/svn/trunk/docs/api/rb/Selenium/WebDriver.html#for-class_method
 
+  profile = Selenium::WebDriver::Firefox::Profile.new
   if !possible_user_agent.nil?
-    if !possible_proxy_ip.nil? && !possible_proxy_port.nil?
-      profile = Selenium::WebDriver::Firefox::Profile.new
       profile['general.useragent.override'] = "#{possible_user_agent}"
+  end
+  if !possible_proxy_ip.nil? && !possible_proxy_port.nil?
       profile['network.proxy.type'] = 1
       profile['network.proxy.http'] = possible_proxy_ip
       profile['network.proxy.http_port'] = possible_proxy_port
       profile['network.proxy.ssl'] = possible_proxy_ip
       profile['network.proxy.ssl_port'] = possible_proxy_port
-      driver = Selenium::WebDriver.for :firefox, :profile => profile
-    else
-      profile = Selenium::WebDriver::Firefox::Profile.new
-      profile['general.useragent.override'] = "#{possible_user_agent}"
-      driver = Selenium::WebDriver.for :firefox, :profile => profile
-    end   # End checking for proxy within user agent name
-  elsif !possible_proxy_ip.nil? && !possible_proxy_port.nil?
-    profile = Selenium::WebDriver::Firefox::Profile.new
-    profile['network.proxy.type'] = 1
-    profile['network.proxy.http'] = possible_proxy_ip
-    profile['network.proxy.http_port'] = possible_proxy_port
-    profile['network.proxy.ssl'] = possible_proxy_ip
-    profile['network.proxy.ssl_port'] = possible_proxy_port
-    driver = Selenium::WebDriver.for :firefox, :profile => profile
-  else
-    driver = Selenium::WebDriver.for :firefox
-  end   #  End checking if using a user agent or not
+  end
   
+  driver = Selenium::WebDriver.for :firefox#, :profile => profile
   return driver
 end
 
