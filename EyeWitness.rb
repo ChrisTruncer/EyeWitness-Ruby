@@ -887,7 +887,7 @@ def selenium_driver(possible_user_agent, possible_proxy_ip, possible_proxy_port)
       profile['network.proxy.ssl_port'] = possible_proxy_port
   end
   
-  driver = Selenium::WebDriver.for :firefox#, :profile => profile
+  driver = Selenium::WebDriver.for :firefox, :profile => profile
   return driver
 end
 
