@@ -948,6 +948,8 @@ def source_header_grab(url_to_head, total_timeout, trace_redirect)
     rescue OpenSSL::SSL::SSLError
       puts "[*] Error: SSL Error connecting to #{url_to_head}"
       response = "SSLERROR"
+    rescue Errno::ECONNRESET
+      response = "CONNECTIONDENIED"
     end
   rescue Timeout::Error
     response = "TIMEDOUT"
@@ -1532,10 +1534,6 @@ begin
           puts "[*] Sleeping for #{sleep_value} seconds..."
           sleep(sleep_value)
         end   # End jitter if statement
-
-      rescue Errno::ECONNRESET
-        puts "[*] Error: Connection reset by server."
-        puts "[*] Error: Skipping to next URL..."
 
       rescue Interrupt
         puts "[*] EXIT: You just rage quit with Ctrl+C!"
