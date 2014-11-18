@@ -1533,7 +1533,7 @@ begin
           sleep(sleep_value)
         end   # End jitter if statement
 
-      rescue Errno:ECONNRESET
+      rescue Errno::ECONNRESET
         puts "[*] Error: Connection reset by server."
         puts "[*] Error: Skipping to next URL..."
 
