@@ -948,6 +948,8 @@ def source_header_grab(url_to_head, total_timeout, trace_redirect)
     rescue OpenSSL::SSL::SSLError
       puts "[*] Error: SSL Error connecting to #{url_to_head}"
       response = "SSLERROR"
+    rescue Errno::ECONNRESET
+      response = "CONNECTIONDENIED"
     end
   rescue Timeout::Error
     response = "TIMEDOUT"

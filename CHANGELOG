@@ -1,3 +1,6 @@
+[11.18.2014]
+    Modified..: Fixed a bug where server reset wasn't caught if using an invalid SSL cert.
+
 [10.16.2014]
     Modified..: EyeWitness no longer leaves alert messages open when changing URLs.  When the URL changes, it SHOULD close out the alert box/basic auth prompt/etc.  Thanks to @harmj0y for yelling at me until I finally looked into figuring it out and getting it done.
 
